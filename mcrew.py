@@ -34,7 +34,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 1. 승무행로표 마스터 원장 데이터 (5자리 완벽 매칭 유지)
+# 1. 승무행로표 마스터 원장 데이터 (이미지 기준 전수 조사 및 완벽 반영)
 # ==============================================================================
 ROSTER_DATA = {
     "85001": {"work_time": "09:44", "rest_time": "00:00", "details": [
@@ -46,27 +46,39 @@ ROSTER_DATA = {
     ]},
     "85002": {"work_time": "09:17", "rest_time": "00:23", "details": [
         {"train_no": "(509) (편승)", "dep_time": "12:36", "arr_time": "12:58", "section": "순천-여수엑스포"},
-        {"train_no": "1504", "dep_time": "14:10", "arr_time": "16:03", "section": "여수-익산(새)"},
+        {"train_no": "1504(새)", "dep_time": "14:10", "arr_time": "16:03", "section": "여수엑스포-익산"},
         {"train_no": "1573", "dep_time": "18:40", "arr_time": "20:26", "section": "익산-순천"},
         {"train_no": "1573", "dep_time": "20:28", "arr_time": "20:52", "section": "순천-여수엑스포"},
         {"train_no": "(534) (편승)", "dep_time": "21:54", "arr_time": "22:13", "section": "여수엑스포-순천"}
     ]},
     "85003": {"work_time": "08:48", "rest_time": "00:00", "details": [
-        {"train_no": "1503", "dep_time": "11:44", "arr_time": "12:10", "section": "순천-여수(새)"},
-        {"train_no": "1574", "dep_time": "13:11", "arr_time": "13:35", "section": "여수-순천"},
+        {"train_no": "1503(새)", "dep_time": "11:44", "arr_time": "12:10", "section": "순천-여수엑스포"},
+        {"train_no": "1574", "dep_time": "13:11", "arr_time": "13:35", "section": "여수엑스포-순천"},
         {"train_no": "1574", "dep_time": "13:37", "arr_time": "15:19", "section": "순천-익산"},
-        {"train_no": "1527", "dep_time": "17:10", "arr_time": "19:14", "section": "익산-여수"}
+        {"train_no": "1527", "dep_time": "17:10", "arr_time": "19:14", "section": "익산-여수엑스포"},
+        {"train_no": "(532) (편승)", "dep_time": "20:22", "arr_time": "20:42", "section": "여수엑스포-순천"}
     ]},
     "85004": {"work_time": "10:59", "rest_time": "00:00", "details": [
         {"train_no": "1524", "dep_time": "10:13", "arr_time": "11:48", "section": "순천-익산"},
         {"train_no": "1571", "dep_time": "13:04", "arr_time": "14:43", "section": "익산-순천"},
         {"train_no": "(522) (편승)", "dep_time": "15:18", "arr_time": "16:32", "section": "순천-익산"},
-        {"train_no": "1505", "dep_time": "19:35", "arr_time": "21:02", "section": "익산-순천(새)"}
+        {"train_no": "1505(새)", "dep_time": "19:35", "arr_time": "21:02", "section": "익산-순천"}
     ]},
     "85005": {"work_time": "12:00", "rest_time": "04:17", "details": [
-        {"train_no": "1506", "dep_time": "19:39", "arr_time": "21:23", "section": "순천-익산(새)"},
-        {"train_no": "1575", "dep_time": "22:26", "arr_time": "00:26", "section": "익산-여수"},
-        {"train_no": "1524", "dep_time": "09:51", "arr_time": "10:12", "section": "여수-순천"}
+        {"train_no": "1506(새)", "dep_time": "19:39", "arr_time": "21:23", "section": "순천-익산"},
+        {"train_no": "1575", "dep_time": "22:26", "arr_time": "00:26", "section": "익산-여수엑스포"},
+        {"train_no": "1524", "dep_time": "09:51", "arr_time": "10:12", "section": "여수엑스포-순천"}
+    ]},
+    "85006": {"work_time": "12:00", "rest_time": "05:05", "details": [
+        {"train_no": "(519) (편승)", "dep_time": "16:57", "arr_time": "17:20", "section": "순천-여수엑스포"},
+        {"train_no": "1506(새)", "dep_time": "19:15", "arr_time": "19:37", "section": "여수엑스포-순천"},
+        {"train_no": "(532) (편승)", "dep_time": "20:44", "arr_time": "22:00", "section": "순천-익산"},
+        {"train_no": "1575", "dep_time": "22:26", "arr_time": "00:26", "section": "익산-여수엑스포"},
+        {"train_no": "1572", "dep_time": "06:30", "arr_time": "06:52", "section": "여수엑스포-순천"}
+    ]},
+    "85007": {"work_time": "12:00", "rest_time": "05:00", "details": [
+        {"train_no": "1977", "dep_time": "18:43", "arr_time": "21:08", "section": "순천-광주송정"},
+        {"train_no": "1972", "dep_time": "06:05", "arr_time": "08:23", "section": "광주송정-순천"}
     ]},
     "85008": {"work_time": "07:40", "rest_time": "00:46", "details": [
         {"train_no": "1975", "dep_time": "14:56", "arr_time": "17:22", "section": "순천-광주송정"},
@@ -88,9 +100,19 @@ ROSTER_DATA = {
         {"train_no": "1981", "dep_time": "14:07", "arr_time": "16:20", "section": "순천-목포"},
         {"train_no": "1994", "dep_time": "17:21", "arr_time": "19:33", "section": "목포-순천"}
     ]},
+    "85013": {"work_time": "09:51", "rest_time": "00:00", "details": [
+        {"train_no": "1572", "dep_time": "06:54", "arr_time": "08:37", "section": "순천-익산"},
+        {"train_no": "1503(새)", "dep_time": "10:19", "arr_time": "11:42", "section": "익산-순천"},
+        {"train_no": "1574", "dep_time": "13:37", "arr_time": "15:19", "section": "순천-익산"},
+        {"train_no": "(519) (편승)", "dep_time": "15:39", "arr_time": "16:55", "section": "익산-순천"}
+    ]},
+    "85014": {"work_time": "07:20", "rest_time": "00:00", "details": [
+        {"train_no": "1993", "dep_time": "10:04", "arr_time": "12:16", "section": "순천-목포"},
+        {"train_no": "1982", "dep_time": "14:48", "arr_time": "17:04", "section": "목포-순천"}
+    ]},
     "85015": {"work_time": "08:47", "rest_time": "00:00", "details": [
         {"train_no": "1572", "dep_time": "06:54", "arr_time": "08:37", "section": "순천-익산"},
-        {"train_no": "1401", "dep_time": "11:43", "arr_time": "12:43", "section": "익산-광양(새)"},
+        {"train_no": "1401(새)", "dep_time": "11:43", "arr_time": "12:43", "section": "익산-광양"},
         {"train_no": "(420) (편승)", "dep_time": "13:40", "arr_time": "14:16", "section": "광양-익산"},
         {"train_no": "(665) (편승)", "dep_time": "14:36", "arr_time": "15:51", "section": "익산-순천"}
     ]},
@@ -98,16 +120,20 @@ ROSTER_DATA = {
         {"train_no": "1932", "dep_time": "10:06", "arr_time": "12:45", "section": "순천-부산"},
         {"train_no": "1931", "dep_time": "15:08", "arr_time": "17:48", "section": "부산-순천"}
     ]},
+    "85017": {"work_time": "07:36", "rest_time": "00:30", "details": [
+        {"train_no": "1971", "dep_time": "06:20", "arr_time": "08:42", "section": "순천-광주송정"},
+        {"train_no": "1974", "dep_time": "11:16", "arr_time": "13:36", "section": "광주송정-순천"}
+    ]},
     "85019": {"work_time": "12:00", "rest_time": "04:26", "details": [
         {"train_no": "(530) (편승)", "dep_time": "19:46", "arr_time": "21:03", "section": "순천-익산"},
-        {"train_no": "1506", "dep_time": "21:25", "arr_time": "00:31", "section": "익산-용산(새)"},
-        {"train_no": "1501", "dep_time": "05:25", "arr_time": "08:36", "section": "용산-익산(새)"},
+        {"train_no": "1506(새)", "dep_time": "21:25", "arr_time": "00:31", "section": "익산-용산"},
+        {"train_no": "1501(새)", "dep_time": "05:25", "arr_time": "08:36", "section": "용산-익산"},
         {"train_no": "(541) (편승)", "dep_time": "09:24", "arr_time": "10:40", "section": "익산-순천"}
     ]},
     "85020": {"work_time": "12:00", "rest_time": "06:01", "details": [
-        {"train_no": "1530", "dep_time": "22:40", "arr_time": "00:30", "section": "여수-익산(새)"},
-        {"train_no": "1521", "dep_time": "05:40", "arr_time": "08:38", "section": "익산-여수(새)"},
-        {"train_no": "(1524) (편승)", "dep_time": "09:51", "arr_time": "10:12", "section": "여수-순천"}
+        {"train_no": "1530(새)", "dep_time": "22:40", "arr_time": "00:30", "section": "여수엑스포-익산"},
+        {"train_no": "1521(새)", "dep_time": "05:40", "arr_time": "08:38", "section": "익산-여수엑스포"},
+        {"train_no": "(1524) (편승)", "dep_time": "09:51", "arr_time": "10:12", "section": "여수엑스포-순천"}
     ]},
     "85901": {"work_time": "08:00", "rest_time": "00:00", "details": [
         {"train_no": "비상대기", "dep_time": "10:20", "arr_time": "18:20", "section": "순천역 비상대기"}
@@ -219,7 +245,7 @@ for idx, tab in enumerate(m_tabs):
                 selection_mode="single-row"
             )
             
-            # [수정 사항] 다중 선택 및 리스트 추출 구조 변경에 따른 0번 인덱스 추출 안전 장치 구축
+            # 다중 선택 에러 방지 안전 코드
             selected_row_idx = 0
             if selection and "rows" in selection.selection and selection.selection["rows"]:
                 selected_row_idx = selection.selection["rows"][0]
@@ -258,7 +284,7 @@ for idx, tab in enumerate(m_tabs):
                     dt_df.columns = ["열차 번호", "출발 시각", "도착 시각", "승무 운행 구간"]
                     st.table(dt_df)
                 else:
-                    # [완벽 자동화] 원장에 데이터가 누락된 새로운 번호라도, 표 데이터 기반으로 에러 없이 즉시 표출
+                    # 원장에 없는 돌발 다이아가 오더라도 에러 창을 띄우지 않는 자동화 로직
                     st.markdown(f"### 🔍 {v_date} <span style='color:#E11D48;'>[다이어 {v_code} (자동 구성)]</span>", unsafe_allow_html=True)
                     
                     c1, c2 = st.columns(2)
@@ -267,7 +293,7 @@ for idx, tab in enumerate(m_tabs):
                     
                     st.markdown("""
                         <div style='background-color:#FFF1F2; padding:12px; border-radius:8px; border-left:4px solid #F43F5E; margin:15px 0;'>
-                            <span style='color:#9F1239; font-size:14px;'>ℹ️ 해당 다이아의 상세 내역은 마스터 원장에 없으므로 표의 열차 정보를 실시간 파싱하여 자동 매칭했습니다.</span>
+                            <span style='color:#9F1239; font-size:14px;'>ℹ️ 해당 다이아의 세부 타임테이블은 마스터 데이터베이스에 등록되어 있지 않아 표 데이터를 기반으로 자동 주입되었습니다.</span>
                         </div>
                     """, unsafe_allow_html=True)
                     
@@ -280,7 +306,7 @@ for idx, tab in enumerate(m_tabs):
                     if dyn_details:
                         st.table(pd.DataFrame(dyn_details))
                     else:
-                        st.info("표기할 수 있는 대표 운행 열차 정보가 존재하지 않습니다.")
+                        st.info("출력할 수 있는 대표 운행 정보가 없습니다.")
             st.markdown('</div>', unsafe_allow_html=True)
 
 # [하단부 업데이트 패널 디자인 고도화]
