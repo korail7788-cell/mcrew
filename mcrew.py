@@ -186,7 +186,7 @@ with btn_col2:
 
 with btn_col3:
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
         for m in range(1, 13):
             m_rows = st.session_state.db.get(str(m), [])
             if m_rows:
