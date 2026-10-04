@@ -34,7 +34,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 1. 승무행로표 마스터 원장 데이터 (이미지 기준 전수 조사 및 완벽 반영)
+# 1. 승무행로표 마스터 원장 데이터 (책자 이미지 전수 조사 완벽 반영)
 # ==============================================================================
 ROSTER_DATA = {
     "85001": {"work_time": "09:44", "rest_time": "00:00", "details": [
@@ -264,11 +264,10 @@ for idx, tab in enumerate(m_tabs):
                 st.markdown(f"### 💤 {v_date} 지정 휴무일 / 비번")
                 st.markdown("<p style='color:#64748B; font-size:15px; margin:10px 0;'>오늘 하루 안전하고 편안하게 쉬세요냥! 😊</p>", unsafe_allow_html=True)
             else:
-            else:
-                # 다이아 번호에서 공백, 물결(~), 괄호 등을 깨끗하게 제거
+                # 다이아 번호 특수기호 청소
                 clean_dia = v_code.replace("~", "").replace("(", "").replace(")", "").strip()
                 
-                # [핵심 수정] 85S15 처럼 중간에 S가 섞여 있으면 원래 마스터 번호인 85015로 강제 변환
+                # [들여쓰기 교정 완료] 85S15 -> 85015, 85S09 -> 85009 자동 강제 치환 장치 탑재
                 if "85S" in clean_dia:
                     clean_dia = clean_dia.replace("85S", "850")
                     
