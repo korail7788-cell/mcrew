@@ -219,14 +219,16 @@ for idx, tab in enumerate(m_tabs):
                 selection_mode="single-row"
             )
             
+            # 여러 행이 선택되거나 비어있을 때를 대비한 안전 코드 보완
             selected_row_idx = 0
             if selection and "rows" in selection.selection and selection.selection["rows"]:
-                selected_row_idx = selection.selection["rows"]
+                # 선택된 것 중 가장 첫 번째 행의 인덱스를 가져옵니다
+                selected_row_idx = selection.selection["rows"][0]
                 
-            v_date = df.iloc[selected_row_idx]["사업일자"]
-            v_code = df.iloc[selected_row_idx]["다이아 번호"]
-            v_on = df.iloc[selected_row_idx]["출근 시각"]
-            v_off = df.iloc[selected_row_idx]["퇴근 시각"]
+            v_date = str(df.iloc[selected_row_idx]["사업일자"])
+            v_code = str(df.iloc[selected_row_idx]["다이아 번호"])
+            v_on = str(df.iloc[selected_row_idx]["출근 시각"])
+            v_off = str(df.iloc[selected_row_idx]["퇴근 시각"])
             
         with right_col:
             st.markdown(f'<div class="card-box">', unsafe_allow_html=True)
@@ -236,16 +238,14 @@ for idx, tab in enumerate(m_tabs):
                 st.markdown("<p style='color:#64748B; font-size:15px; margin:10px 0;'>오늘 하루 안전하고 편안하게 쉬세요냥! 😊</p>", unsafe_allow_html=True)
             else:
                 clean_dia = v_code.replace("~", "").replace("(", "").replace(")", "").strip()
-                is_edu = False
-                if len(clean_dia) >= 3 and "S" in clean_dia:
-                    is_edu = True
-                    clean_dia = clean_dia.replace("S", "0")
+                is_full_dia = False
+                if len(clean_dia) >= 5:
+                    is_full_dia = True
                     
                 if clean_dia in ROSTER_DATA:
                     info = ROSTER_DATA[clean_dia]
                     st.markdown(f"### 🔍 {v_date} <span style='color:#2563EB;'>[다이어 {v_code}]</span> 세부 행로", unsafe_allow_html=True)
                     
-                    # 프리미엄 메트릭 출퇴근 인포 대시보드 스킨 적용
                     c1, c2 = st.columns(2)
                     c1.metric("⏰ 출근 시각", v_on)
                     c2.metric("🏁 퇴근 시각", v_off)
@@ -255,9 +255,6 @@ for idx, tab in enumerate(m_tabs):
                             <span style='color:#334155; font-size:14px;'>⏱️ <b>총 근무:</b> {info['work_time']} &nbsp;&nbsp;|&nbsp;&nbsp; ☕ <b>휴게 및 대기:</b> {info['rest_time']}</span>
                         </div>
                     """, unsafe_allow_html=True)
-                    
-                    if is_edu:
-                        st.error("★ S 다이어: 교육 1시간 추가 직무 대상")
                         
                     dt_df = pd.DataFrame(info["details"])
                     dt_df.columns = ["열차 번호", "출발 시각", "도착 시각", "승무 운행 구간"]
