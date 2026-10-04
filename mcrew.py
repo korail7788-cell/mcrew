@@ -264,7 +264,13 @@ for idx, tab in enumerate(m_tabs):
                 st.markdown(f"### 💤 {v_date} 지정 휴무일 / 비번")
                 st.markdown("<p style='color:#64748B; font-size:15px; margin:10px 0;'>오늘 하루 안전하고 편안하게 쉬세요냥! 😊</p>", unsafe_allow_html=True)
             else:
+            else:
+                # 다이아 번호에서 공백, 물결(~), 괄호 등을 깨끗하게 제거
                 clean_dia = v_code.replace("~", "").replace("(", "").replace(")", "").strip()
+                
+                # [핵심 수정] 85S15 처럼 중간에 S가 섞여 있으면 원래 마스터 번호인 85015로 강제 변환
+                if "85S" in clean_dia:
+                    clean_dia = clean_dia.replace("85S", "850")
                     
                 if clean_dia in ROSTER_DATA:
                     info = ROSTER_DATA[clean_dia]
