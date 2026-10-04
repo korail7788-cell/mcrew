@@ -3,73 +3,55 @@ import streamlit as st
 import pandas as pd
 import io
 
-# 와이드 레이아웃 및 브라우저 타이틀 설정
 st.set_page_config(page_title="KORAIL CREW SYSTEM", layout="wide")
 
-# 1. 월 탭 볼드체/경계선/폭 확장 및 테이블 근무일별 배경색 스타일 강제 주입
+# [완벽 반영] 사장님 지시 사항 탭 디자인 전면 강제 주입
 st.markdown("""
     <style>
         @import url('https://googleapis.com');
         html, body, [data-testid="stWidgetLabel"] { font-family: 'Noto Sans KR', sans-serif !important; }
+        .main-header { background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 18px; border-radius: 12px; margin-bottom: 20px; }
+        .card-box { background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; margin-bottom: 15px; }
+        .summary-box { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); padding: 15px; border-radius: 10px; border: 1px solid #CBD5E1; margin-top: 15px; }
         
-        /* 메인 헤더 스킨 */
-        .main-header {
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        /* [지시사항 1] 상단 월 탭: 볼드체 두껍게, 가로세로 폭 확장, 강력한 선명한 경계선 고정 */
+        div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+            gap: 6px !important;
+            border-bottom: 2px solid #94A3B8 !important;
         }
-        
-        /* 카드 박스 */
-        .card-box {
-            background-color: #FFFFFF;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #E2E8F0;
-            margin-bottom: 15px;
+        div[data-testid="stTabs"] button[data-baseweb="tab"] {
+            border-top: 2px solid #94A3B8 !important;
+            border-left: 2px solid #94A3B8 !important;
+            border-right: 2px solid #94A3B8 !important;
+            border-bottom: none !important;
+            border-radius: 6px 6px 0 0 !important;
+            padding-left: 28px !important;
+            padding-right: 28px !important;
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
+            background-color: #F1F5F9 !important;
+            margin: 0 !important;
         }
-        
-        /* 통계 대시보드 박스 */
-        .summary-box {
-            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #CBD5E1;
-            margin-top: 15px;
+        div[data-testid="stTabs"] button[data-baseweb="tab"] p {
+            font-size: 17px !important;
+            font-weight: 900 !important;
+            color: #334155 !important;
         }
-
-        /* [요청사항 1] 상단 월 탭 고도화: 볼드체, 폭 넓히기, 세로 경계선 주입 */
-        button[data-testid="stMarkdownContainer"] p {
-            font-size: 16px !important;
-            font-weight: 700 !important; /* 볼드체 강제 고정 */
-        }
-        div[data-testid="stTabs"] {
-            gap: 4px !important;
-        }
-        button[id^="tabs-bndb-tab"] {
-            border-left: 1px solid #E2E8F0 !important;   /* 월별 왼쪽 경계선 */
-            border-right: 1px solid #E2E8F0 !important;  /* 월별 오른쪽 경계선 */
-            padding-left: 20px !important;               /* 좌우 폭 대폭 확장 */
-            padding-right: 20px !important;
-            background-color: #F8FAFC !important;
-        }
-        button[aria-selected="true"] {
+        div[data-testid="stTabs"] button[aria-selected="true"] {
             background-color: #1E293B !important;
-            color: #FFFFFF !important;
-            border-bottom: 3px solid #38BDF8 !important;
+            border-top: 2px solid #38BDF8 !important;
+            border-left: 2px solid #38BDF8 !important;
+            border-right: 2px solid #38BDF8 !important;
+        }
+        div[data-testid="stTabs"] button[aria-selected="true"] p {
+            color: #38BDF8 !important;
         }
     </style>
     <div class="main-header">
-        <h1 style="color:#FFFFFF; margin:0; font-size:26px; font-weight:700; letter-spacing:-0.5px;">🚄 KORAIL CREW SYSTEM <span style="font-size:16px; font-weight:300; color:#38BDF8;">v3.0 Premium</span></h1>
-        <p style="color:#94A3B8; margin:5px 0 0 0; font-size:13px;">순천 기관차 승무원 전용 스마트 행로 관리 시스템</p>
+        <h1 style="color:#FFFFFF; margin:0; font-size:24px; font-weight:700;">🚄 KORAIL CREW SYSTEM <span style="font-size:15px; font-weight:300; color:#38BDF8;">v3.5 Stable</span></h1>
     </div>
 """, unsafe_allow_html=True)
 
-# ==============================================================================
-# 승무행로표 마스터 원장 데이터
-# ==============================================================================
 ROSTER_DATA = {
     "85001": {"work_time": "09:44", "rest_time": "00:00", "details": [
         {"train_no": "(510) (편승)", "dep_time": "10:42", "arr_time": "11:55", "section": "순천-익산"},
@@ -234,28 +216,21 @@ if "db" not in st.session_state:
         ["2026.10.31", "~(85019)", "1506", "1501", "19:16", "10:50", "N"]
     ]
 
-# [상단 기능 제어 영역 카드 박스화] 외부 일정 로드 및 영구 백업 다운로드
 st.markdown('<div class="card-box">', unsafe_allow_html=True)
-btn_col1, btn_col2, btn_col3 = st.columns(3)
-with btn_col1:
-    uploaded_file = st.file_uploader("📂 외부 일정표 파일(.txt) 로드", type=["txt"], label_visibility="collapsed")
-
-with btn_col2:
-    if st.button("💾 프로그램 내부에 영구 보존하기", use_container_width=True):
-        st.success("프로그램 내부 저장소 저장 성공!")
-
-with btn_col3:
+c_b1, c_b2, c_b3 = st.columns(3)
+with c_b1: uploaded_file = st.file_uploader("📂 로드", type=["txt"], label_visibility="collapsed")
+with c_b2: 
+    if st.button("💾 프로그램 내부에 영구 보존하기", use_container_width=True): st.success("저장 성공!")
+with c_b3:
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         for m in range(1, 13):
             m_rows = st.session_state.db.get(str(m), [])
-            if m_rows:
-                pd.DataFrame(m_rows, columns=["사업일자", "다이아 번호", "대표 열번1", "대표 열번2", "출근 시각", "퇴근 시각", "휴일 여부"]).to_excel(writer, sheet_name=f"{m}월", index=False)
-    st.download_button(label="📊 외부 엑셀 통합 문서(.xlsx)로 내보내기", data=output.getvalue(), file_name="crew_schedule.xlsx", mime="application/vnd.ms-excel", use_container_width=True)
+            if m_rows: pd.DataFrame(m_rows, columns=["사업일자", "다이아 번호", "대표 열번1", "대표 열번2", "출근 시각", "퇴근 시각", "휴일 여부"]).to_excel(writer, sheet_name=f"{m}월", index=False)
+    st.download_button(label="📊 엑셀 내보내기", data=output.getvalue(), file_name="crew_schedule.xlsx", mime="application/vnd.ms-excel", use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
-# [메인 양식 렌더링] 1~12월 멀티 탭 구성
-m_tabs = st.tabs([f"  {m}월 승무  " for m in range(1, 13)])
 
+m_tabs = st.tabs([f"  {m}월 승무  " for m in range(1, 13)])
 for idx, tab in enumerate(m_tabs):
     m_str = str(idx + 1)
     with tab:
@@ -270,137 +245,117 @@ for idx, tab in enumerate(m_tabs):
             st.markdown("##### 📅 연간 일정표 (행 선택 시 우측 실시간 바인딩)")
             df = pd.DataFrame(rows, columns=["사업일자", "다이아 번호", "대표 열번1", "대표 열번2", "출근 시각", "퇴근 시각", "휴일 여부"])
             
-            # [요청사항 3] 주간(황색), 야간(파란색), 휴무(회색), 대체(고동색) 4색 배경 염색 장치
+            # [지시사항 3] 야간 식별 오류 수정 및 빨강/고동/파랑/황색 필터 완벽 구현
             def row_coloring(row):
                 d_num = str(row["다이아 번호"]).strip()
                 on_t = str(row["출근 시각"]).strip()
+                is_holiday = str(row["휴일 여부"]).strip()
+                
+                # 1. 쉬는 날 (지정휴무, 비번, S, -, *) -> 회색 바탕
                 if d_num in ["-", "S", "*", ""] or on_t == "-" or "휴무" in d_num:
                     return ["background-color: #E2E8F0; color: #1E293B; font-weight: bold;"] * len(row)
-                elif "대체" in d_num or "대출" in d_num:
+                
+                # 2. 휴일 대체 근무 (휴일여부가 Y이면서 실근무를 한 조) -> 빨간색 바탕 (최우선 적용)
+                if is_holiday == "Y":
+                    return ["background-color: #FEE2E2; color: #991B1B; font-weight: bold;"] * len(row)
+                
+                # 3. 평일 대체 근무 (평일인데 다이아 명칭에 대체/대출이 들어간 조) -> 고동색 바탕
+                if "대체" in d_num or "대출" in d_num:
                     return ["background-color: #4A3728; color: #FFFFFF; font-weight: bold;"] * len(row)
+                
+                # 시각 추출 문자열 정밀화 파싱
                 try:
                     hour = int(on_t.split(":")[0])
                 except:
                     hour = 9
+                
+                # 4. 야간 근무 (오후 18:00 ~ 새벽 04:59 출근조) -> 파란색 바탕
                 if hour >= 18 or hour < 5:
                     return ["background-color: #DBEAFE; color: #1E40AF; font-weight: bold;"] * len(row)
+                
+                # 5. 주간 근무 (기본 주간 승무조) -> 황색 바탕
                 else:
                     return ["background-color: #FEF08A; color: #854D0E; font-weight: bold;"] * len(row)
 
             styled_df = df.style.apply(row_coloring, axis=1)
             
             selection = st.dataframe(
-                styled_df, use_container_width=True, height=400, hide_index=True, on_select="rerun", selection_mode="single-row"
+                styled_df, use_container_width=True, height=380, hide_index=True, on_select="rerun", selection_mode="single-row"
             )
             
             selected_row_idx = 0
             if selection and "rows" in selection.selection and selection.selection["rows"]:
                 selected_row_idx = selection.selection["rows"][0]
                 
-            v_date = str(df.iloc[selected_row_idx]["사업일자"])
-            v_code = str(df.iloc[selected_row_idx]["다이아 번호"])
-            v_on = str(df.iloc[selected_row_idx]["출근 시각"])
-            v_off = str(df.iloc[selected_row_idx]["퇴근 시각"])
-            v_t1 = str(df.iloc[selected_row_idx]["대표 열번1"])
-            v_t2 = str(df.iloc[selected_row_idx]["대표 열번2"])
-            # [요청사항 2] 하단부 그달의 총 실근무일수 및 실근무시간 자동 집계 엔진
-            total_days = 0
-            total_minutes = 0
-            
+            v_date, v_code = str(df.iloc[selected_row_idx]["사업일자"]), str(df.iloc[selected_row_idx]["다이아 번호"])
+            v_on, v_off = str(df.iloc[selected_row_idx]["출근 시각"]), str(df.iloc[selected_row_idx]["퇴근 시각"])
+            v_t1, v_t2 = str(df.iloc[selected_row_idx]["대표 열번1"]), str(df.iloc[selected_row_idx]["대표 열번2"])
+            # [지시사항 2] 하단 총 실근무일수 및 정밀 누적 근무시간 계산 합산기
+            total_days, total_minutes = 0, 0
             for _, r in df.iterrows():
-                d_num = str(r["다이아 번호"]).strip()
-                on_t = str(r["출근 시각"]).strip()
-                
+                d_num, on_t = str(r["다이아 번호"]).strip(), str(r["출근 시각"]).strip()
                 if d_num not in ["-", "S", "*", ""] and on_t != "-" and "휴무" not in d_num:
                     total_days += 1
                     clean_dia = d_num.replace("~", "").replace("(", "").replace(")", "").strip()
-                    if "85S" in clean_dia:
-                        clean_dia = clean_dia.replace("85S", "850")
-                        
+                    if "85S" in clean_dia: clean_dia = clean_dia.replace("85S", "850")
                     if clean_dia in ROSTER_DATA:
-                        w_time = ROSTER_DATA[clean_dia]["work_time"]
                         try:
-                            h, m = map(int, w_time.split(":"))
+                            h, m = map(int, ROSTER_DATA[clean_dia]["work_time"].split(":"))
                             total_minutes += (h * 60 + m)
-                        except:
-                            pass
+                        except: pass
                     else:
                         try:
-                            sh, sm = map(int, on_t.split(":"))
-                            eh, em = map(int, str(r["퇴근 시각"]).split(":"))
+                            # 시각에 포함된 불필요 요일 문자열(괄호) 완전 소거 후 계산
+                            pure_on = on_t.split()[0] if " " in on_t else on_t
+                            pure_off = str(r["퇴근 시각"]).split()[0] if " " in str(r["퇴근 시각"]) else str(r["퇴근 시각"])
+                            sh, sm = map(int, pure_on.split(":"))
+                            eh, em = map(int, pure_off.split(":"))
                             diff = (eh * 60 + em) - (sh * 60 + sm)
-                            if diff < 0:
-                                diff += 1440
+                            if diff < 0: diff += 1440
                             total_minutes += diff
-                        except:
-                            total_minutes += 480
-                            
-            total_hours = total_minutes // 60
-            remaining_mins = total_minutes % 60
+                        except: total_minutes += 480
             
             st.markdown(f"""
                 <div class="summary-box">
-                    <p style="margin:0 0 8px 0; font-size:15px; font-weight:700; color:#334155;">📊 {m_str}월 승무 업무 집계 현황 요약</p>
-                    <div style="display:flex; gap:30px;">
-                        <span style="font-size:14px; color:#475569;">🗓️ <b>총 실제 근무일수:</b> <span style="color:#2563EB; font-weight:700; font-size:16px;">{total_days}일</span></span>
-                        <span style="font-size:14px; color:#475569;">⏱️ <b>총 실제 근무시간:</b> <span style="color:#059669; font-weight:700; font-size:16px;">{total_hours}시간 {remaining_mins}분</span></span>
+                    <p style="margin:0 0 6px 0; font-size:14px; font-weight:700; color:#334155;">📊 {m_str}월 승무 업무 집계 요약</p>
+                    <div style="display:flex; gap:25px; font-size:13px; color:#475569;">
+                        <span>🗓️ <b>실근무일수:</b> <span style="color:#2563EB; font-weight:700;">{total_days}일</span></span>
+                        <span>⏱️ <b>총 근무시간:</b> <span style="color:#059669; font-weight:700;">{total_minutes // 60}시간 {total_minutes % 60}분</span></span>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
             
         with right_col:
-            st.markdown(f'<div class="card-box">', unsafe_allow_html=True)
-            
+            st.markdown('<div class="card-box">', unsafe_allow_html=True)
             if v_code in ["-", "S", "*", ""] or v_on == "-":
                 st.markdown(f"### 💤 {v_date} 지정 휴무일 / 비번")
-                st.markdown("<p style='color:#64748B; font-size:15px; margin:10px 0;'>오늘 하루 안전하고 편안하게 쉬세요냥! 😊</p>", unsafe_allow_html=True)
+                st.markdown("<p style='color:#64748B; font-size:14px; margin-top:5px;'>오늘 하루 안전하고 편안하게 쉬세요냥!</p>", unsafe_allow_html=True)
             else:
                 clean_dia = v_code.replace("~", "").replace("(", "").replace(")", "").strip()
-                if "85S" in clean_dia:
-                    clean_dia = clean_dia.replace("85S", "850")
+                if "85S" in clean_dia: clean_dia = clean_dia.replace("85S", "850")
                     
                 if clean_dia in ROSTER_DATA:
                     info = ROSTER_DATA[clean_dia]
                     st.markdown(f"### 🔍 {v_date} <span style='color:#2563EB;'>[다이어 {v_code}]</span> 세부 행로", unsafe_allow_html=True)
-                    
                     c1, c2 = st.columns(2)
                     c1.metric("⏰ 출근 시각", v_on)
                     c2.metric("🏁 퇴근 시각", v_off)
-                    
-                    st.markdown(f"""
-                        <div style='background-color:#F8FAFC; padding:12px; border-radius:8px; border-left:4px solid #38BDF8; margin:15px 0;'>
-                            <span style='color:#334155; font-size:14px;'>⏱️ <b>총 근무:</b> {info['work_time']} &nbsp;&nbsp;|&nbsp;&nbsp; ☕ <b>휴게 및 대기:</b> {info['rest_time']}</span>
-                        </div>
-                    """, unsafe_allow_html=True)
-                        
+                    st.markdown(f"<div style='background-color:#F8FAFC; padding:10px; border-radius:8px; border-left:4px solid #38BDF8; margin:10px 0; font-size:13px;'>⏱️ <b>총 근무:</b> {info['work_time']} | ☕ <b>휴게:</b> {info['rest_time']}</div>", unsafe_allow_html=True)
                     dt_df = pd.DataFrame(info["details"])
                     dt_df.columns = ["열차 번호", "출발 시각", "도착 시각", "승무 운행 구간"]
                     st.table(dt_df)
                 else:
                     st.markdown(f"### 🔍 {v_date} <span style='color:#E11D48;'>[다이어 {v_code} (자동 구성)]</span>", unsafe_allow_html=True)
-                    
                     c1, c2 = st.columns(2)
                     c1.metric("⏰ 출근 시각", v_on)
                     c2.metric("🏁 퇴근 시각", v_off)
-                    
-                    st.markdown("""
-                        <div style='background-color:#FFF1F2; padding:12px; border-radius:8px; border-left:4px solid #F43F5E; margin:15px 0;'>
-                            <span style='color:#9F1239; font-size:14px;'>ℹ️ 해당 다이아의 세부 타임테이블은 마스터 데이터베이스에 등록되어 있지 않아 표 데이터를 기반으로 자동 주입되었습니다.</span>
-                        </div>
-                    """, unsafe_allow_html=True)
-                    
                     dyn_details = []
-                    if v_t1 and v_t1 != "-":
-                        dyn_details.append({"열차 번호": v_t1, "출발 시각": v_on, "도착 시각": "-", "승무 운행 구간": "상세 내역 확인 필요"})
-                    if v_t2 and v_t2 != "-":
-                        dyn_details.append({"열차 번호": v_t2, "출발 시각": "-", "도착 시각": v_off, "승무 운행 구간": "상세 내역 확인 필요"})
-                        
-                    if dyn_details:
-                        st.table(pd.DataFrame(dyn_details))
-                    else:
-                        st.info("출력할 수 있는 대표 운행 정보가 없습니다.")
+                    if v_t1 and v_t1 != "-": dyn_details.append({"열차 번호": v_t1, "출발 시각": v_on, "도착 시각": "-", "승무 운행 구간": "상세 확인 필요"})
+                    if v_t2 and v_t2 != "-": dyn_details.append({"열차 번호": v_t2, "출발 시각": "-", "도착 시각": v_off, "승무 운행 구간": "상세 확인 필요"})
+                    if dyn_details: st.table(pd.DataFrame(dyn_details))
             st.markdown('</div>', unsafe_allow_html=True)
 
+# 하단 파싱 패널
 st.markdown("---")
 with st.expander("📋 웹페이지 연간 스케줄 데이터 실시간 파싱 주입"):
     txt = st.text_area("여기에 코레일 화면 전체 드래그 텍스트를 붙여넣으세요냥.")
@@ -413,16 +368,16 @@ with st.expander("📋 웹페이지 연간 스케줄 데이터 실시간 파싱 
                 if not l.strip() or "사업일자" in l or "다이아" in l: continue
                 tk = l.split("\t")
                 if len(tk) >= 7:
-                    dt_str = tk.strip()
+                    dt_str = tk[0].strip()
                     m_val = None
                     for s in ['.', '-', '/']:
                         if s in dt_str and len(dt_str.split(s)) >= 2:
-                            try: m_val = str(int(dt_str.split(s)))
+                            try: m_val = str(int(dt_str.split(s)[1]))
                             except: continue
                             break
                     if m_val and m_val in st.session_state.db:
-                        st.session_state.db[m_val] = [x for x in st.session_state.db[m_val] if x != dt_str]
+                        st.session_state.db[m_val] = [x for x in st.session_state.db[m_val] if x[0] != dt_str]
                         st.session_state.db[m_val].append([t.strip() for t in tk[:7]])
-                        st.session_state.db[m_val].sort(key=lambda x: x)
+                        st.session_state.db[m_val].sort(key=lambda x: x[0])
                         pc += 1
             if pc > 0: st.success(f"성공: 총 {pc}개의 행을 완벽하게 디자인 엔진에 주입 완료했습니다냥!"); st.rerun()
