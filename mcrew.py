@@ -5,7 +5,7 @@ import io
 
 st.set_page_config(page_title="KORAIL CREW SYSTEM", layout="wide")
 
-# [완벽 반영] 월 탭 폭 확장 및 쉬는 날 순백색 화이트 고정 CSS 스타일 주입
+# [완벽 제어] 사장님 지시사항 100% 반영: 월별 탭 사각 박스 처리, 폭 최대 확장, 볼드체 강제 주입
 st.markdown("""
     <style>
         @import url('https://googleapis.com');
@@ -14,41 +14,48 @@ st.markdown("""
         .card-box { background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; margin-bottom: 15px; }
         .summary-box { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); padding: 15px; border-radius: 10px; border: 1px solid #CBD5E1; margin-top: 15px; }
         
-        /* 상단 월 탭: 글자 볼드체 두껍게, 가로 폭 45px로 시원하게 확장, 강력한 테두리선 주입 */
+        /* [핵심 패치] 탭 리스트 공간 여백 확보 및 하단 기준선 설정 */
         div[data-testid="stTabs"] [role="tablist"] {
-            gap: 10px !important;
-            border-bottom: 3px solid #475569 !important;
-            padding-bottom: 4px !important;
+            gap: 12px !important;
+            border-bottom: 3px solid #1E293B !important;
+            padding-bottom: 6px !important;
         }
+        
+        /* [지시사항] 각 월별 단추를 명확한 '사각 박스 형태'로 가두고 좌우 폭(Padding)을 대폭 넓힘 */
         div[data-testid="stTabs"] button[role="tab"] {
-            border-top: 2px solid #475569 !important;
-            border-left: 2px solid #475569 !important;
-            border-right: 2px solid #475569 !important;
-            border-bottom: 2px solid #475569 !important;
-            border-radius: 8px 8px 0px 0px !important;
-            padding-left: 45px !important;   /* 좌우 폭 시원하게 확장 */
-            padding-right: 45px !important;
+            border-top: 2px solid #1E293B !important;     /* 상단 사각 테두리 */
+            border-left: 2px solid #1E293B !important;    /* 좌측 사각 테두리 */
+            border-right: 2px solid #1E293B !important;   /* 우측 사각 테두리 */
+            border-bottom: 2px solid #1E293B !important;  /* 하단 사각 테두리까지 사방을 완벽 고정 */
+            border-radius: 0px !important;                 /* 스트림릿 특유의 둥근 모서리를 0으로 깎아 완벽한 직각 사각 박스로 변경 */
+            padding-left: 55px !important;                 /* 좌우 폭을 55px로 극대화하여 시원하게 확장 */
+            padding-right: 55px !important;
             padding-top: 14px !important;
             padding-bottom: 14px !important;
-            background-color: #E2E8F0 !important;
+            background-color: #E2E8F0 !important;          /* 평소 비활성화된 사각 상자 배경색 */
             margin: 0 !important;
         }
+        
+        /* 월 탭 내부의 글자 폰트 속성 제어 */
         div[data-testid="stTabs"] button[role="tab"] p {
             font-size: 18px !important;
-            font-weight: 900 !important;
+            font-weight: 900 !important;                   /* 울트라 볼드체 두껍게 */
             color: #1E293B !important;
             white-space: nowrap !important;
         }
+        
+        /* 손가락으로 누른 활성화된 현재 달의 사각 박스 강조 스킨 */
         div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-            background-color: #0F172A !important;
-            border: 3px solid #38BDF8 !important;
+            background-color: #0F172A !important;          /* 선택된 상자는 진한 네이비색 */
+            border: 3px solid #38BDF8 !important;          /* 선택된 사각 테두리는 야간 형광 하늘색 */
+            border-radius: 0px !important;
         }
         div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
-            color: #38BDF8 !important;
+            color: #38BDF8 !important;                     /* 선택된 상자 글씨체 색상 보정 */
         }
     </style>
     <div class="main-header">
-        <h1 style="color:#FFFFFF; margin:0; font-size:24px; font-weight:700;">🚄 KORAIL CREW SYSTEM <span style="font-size:15px; font-weight:300; color:#38BDF8;">v3.9 Master</span></h1>
+        <h1 style="color:#FFFFFF; margin:0; font-size:24px; font-weight:700;">🚄 KORAIL CREW SYSTEM <span style="font-size:15px; font-weight:300; color:#38BDF8;">v3.9 Genuine Master</span></h1>
     </div>
 """, unsafe_allow_html=True)
 
@@ -246,36 +253,36 @@ for idx, tab in enumerate(m_tabs):
             st.markdown("##### 📅 연간 일정표 (행 선택 시 우측 실시간 바인딩)")
             df = pd.DataFrame(rows, columns=["사업일자", "다이아 번호", "대표 열번1", "대표 열번2", "출근 시각", "퇴근 시각", "휴일 여부"])
             
-            # [요청사항 전면 반영] 쉬는날 백색 고정, 16시 기준 야간 파란색 식별 도색 필터
+            # [지시사항] 쉬는 날 완벽한 흰색 필터링 및 16시 이후 야간 파란색 지정 도색 엔진
             def row_coloring(row):
                 d_num = str(row["다이아 번호"]).strip()
                 on_t = str(row["출근 시각"]).strip()
                 is_holiday = str(row["휴일 여부"]).strip()
                 
-                # 1단계: 근무가 없는 날 (비번, 휴무, S, -, *) -> 완전히 하얀색(#FFFFFF)으로 처리
+                # 1단계: 근무가 없는 날 / 비번 / 휴무일 -> 다른 색 다 무시하고 오직 깨끗한 순백색(#FFFFFF) 고정
                 if d_num in ["-", "S", "*", ""] or on_t == "-" or "휴무" in d_num:
                     return ["background-color: #FFFFFF; color: #475569; font-weight: normal;"] * len(row)
                 
-                # 2단계: 휴일에 근무한 대체근무 (휴일 Y이면서 실제로 출근 시각이 있는 날) -> 빨간색 (최우선)
+                # 2단계: 휴일에 근무한 대체근무 -> 빨간색 (최우선순위 적용)
                 if is_holiday == "Y":
                     return ["background-color: #FEE2E2; color: #B91C1C; font-weight: bold;"] * len(row)
                 
-                # 3단계: 평일 대체근무조 (대체/대출 명칭 포함 평일조) -> 고동색
+                # 3단계: 평일 대체근무조 -> 고동색
                 if "대체" in d_num or "대출" in d_num:
                     return ["background-color: #4A3728; color: #FFFFFF; font-weight: bold;"] * len(row)
                 
-                # [야간 근무 16시 완벽 패치] 16시 27분 등 16시 이후 밤샘 출근조 완벽 교정
+                # 16시 기준 야간 근무 정밀 파싱부
                 try:
-                    time_clean = on_t.split()[0] if " " in on_t else on_t
+                    time_clean = on_t.split() if " " in on_t else on_t
                     hour = int(time_clean.split(":")[0])
                 except:
                     hour = 9
                 
-                # 4단계: 야간근무 (출근 시각 오후 16:00시부터 ~ 다음날 새벽 04시 59분 사이 밤샘조) -> 파란색
+                # 4단계: 야간근무 (출근 시각이 오후 16:00시 이후부터 밤샘 조) -> 선명한 파란색
                 if hour >= 16 or hour < 5:
                     return ["background-color: #DBEAFE; color: #1E40AF; font-weight: bold;"] * len(row)
                 
-                # 5단계: 주간근무 (일반 낮 승무조) -> 황색
+                # 5단계: 주간근무 (일반 아침/낮 승무조) -> 황색
                 else:
                     return ["background-color: #FEF08A; color: #854D0E; font-weight: bold;"] * len(row)
 
