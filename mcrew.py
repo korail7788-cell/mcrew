@@ -3,10 +3,9 @@ import streamlit as st
 import pandas as pd
 import io
 
-# 와이드 레이아웃 설정 및 기본 폰트 서체 고정
 st.set_page_config(page_title="KORAIL CREW SYSTEM", layout="wide")
 
-# [디자인 모바일 전면 개조] 월 탭 글자를 무조건 굵고 크게, 세로 분할 격자선을 확실하게 주입
+# [완벽 반영] 월 탭 폭 확장 및 쉬는 날 순백색 화이트 고정 CSS 스타일 주입
 st.markdown("""
     <style>
         @import url('https://googleapis.com');
@@ -15,10 +14,10 @@ st.markdown("""
         .card-box { background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; margin-bottom: 15px; }
         .summary-box { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); padding: 15px; border-radius: 10px; border: 1px solid #CBD5E1; margin-top: 15px; }
         
-        /* [지시사항 1번 패치] 월 선택 단추: 글자 크기 대폭 확장, 울트라 볼드체, 선명한 가로세로 격자 테두리 강제 고정 */
+        /* 상단 월 탭: 글자 볼드체 두껍게, 가로 폭 45px로 시원하게 확장, 강력한 테두리선 주입 */
         div[data-testid="stTabs"] [role="tablist"] {
-            gap: 8px !important;
-            border-bottom: 3px solid #64748B !important;
+            gap: 10px !important;
+            border-bottom: 3px solid #475569 !important;
             padding-bottom: 4px !important;
         }
         div[data-testid="stTabs"] button[role="tab"] {
@@ -27,14 +26,18 @@ st.markdown("""
             border-right: 2px solid #475569 !important;
             border-bottom: 2px solid #475569 !important;
             border-radius: 8px 8px 0px 0px !important;
-            padding: 14px 28px !important;
+            padding-left: 45px !important;   /* 좌우 폭 시원하게 확장 */
+            padding-right: 45px !important;
+            padding-top: 14px !important;
+            padding-bottom: 14px !important;
             background-color: #E2E8F0 !important;
             margin: 0 !important;
         }
         div[data-testid="stTabs"] button[role="tab"] p {
             font-size: 18px !important;
-            font-weight: 900 !important; /* 최고 두께 보증 */
+            font-weight: 900 !important;
             color: #1E293B !important;
+            white-space: nowrap !important;
         }
         div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
             background-color: #0F172A !important;
@@ -45,11 +48,11 @@ st.markdown("""
         }
     </style>
     <div class="main-header">
-        <h1 style="color:#FFFFFF; margin:0; font-size:24px; font-weight:700;">🚄 KORAIL CREW SYSTEM <span style="font-size:15px; font-weight:300; color:#38BDF8;">v3.7 Master</span></h1>
+        <h1 style="color:#FFFFFF; margin:0; font-size:24px; font-weight:700;">🚄 KORAIL CREW SYSTEM <span style="font-size:15px; font-weight:300; color:#38BDF8;">v3.9 Master</span></h1>
     </div>
 """, unsafe_allow_html=True)
 
-# 마스터 데이터 원장
+# 마스터 데이터 원장 파트 1
 ROSTER_DATA = {
     "85001": {"work_time": "09:44", "rest_time": "00:00", "details": [
         {"train_no": "(510) (편승)", "dep_time": "10:42", "arr_time": "11:55", "section": "순천-익산"},
@@ -243,36 +246,36 @@ for idx, tab in enumerate(m_tabs):
             st.markdown("##### 📅 연간 일정표 (행 선택 시 우측 실시간 바인딩)")
             df = pd.DataFrame(rows, columns=["사업일자", "다이아 번호", "대표 열번1", "대표 열번2", "출근 시각", "퇴근 시각", "휴일 여부"])
             
-            # [완벽 수정] 17시 야간 승무조 반영 및 5단계 실시간 도색 매칭 스크립트
+            # [요청사항 전면 반영] 쉬는날 백색 고정, 16시 기준 야간 파란색 식별 도색 필터
             def row_coloring(row):
                 d_num = str(row["다이아 번호"]).strip()
                 on_t = str(row["출근 시각"]).strip()
                 is_holiday = str(row["휴일 여부"]).strip()
                 
-                # 1단계: 쉬는 날 / 비번 -> 회색
+                # 1단계: 근무가 없는 날 (비번, 휴무, S, -, *) -> 완전히 하얀색(#FFFFFF)으로 처리
                 if d_num in ["-", "S", "*", ""] or on_t == "-" or "휴무" in d_num:
-                    return ["background-color: #E2E8F0; color: #1E293B; font-weight: bold;"] * len(row)
+                    return ["background-color: #FFFFFF; color: #475569; font-weight: normal;"] * len(row)
                 
-                # 2단계: 휴일 대체근무 (휴일 Y 이면서 실제로 일을 한 조) -> 빨간색 (최우선순위)
+                # 2단계: 휴일에 근무한 대체근무 (휴일 Y이면서 실제로 출근 시각이 있는 날) -> 빨간색 (최우선)
                 if is_holiday == "Y":
                     return ["background-color: #FEE2E2; color: #B91C1C; font-weight: bold;"] * len(row)
                 
-                # 3단계: 평일 대체근무조 (대체/대출 글자가 들어간 평일 조) -> 고동색
+                # 3단계: 평일 대체근무조 (대체/대출 명칭 포함 평일조) -> 고동색
                 if "대체" in d_num or "대출" in d_num:
                     return ["background-color: #4A3728; color: #FFFFFF; font-weight: bold;"] * len(row)
                 
-                # [야간 근무 17시 버그 수정] 문자열 데이터 공백 및 괄호 분리 후 순수 시간(Hour) 분석
+                # [야간 근무 16시 완벽 패치] 16시 27분 등 16시 이후 밤샘 출근조 완벽 교정
                 try:
                     time_clean = on_t.split()[0] if " " in on_t else on_t
                     hour = int(time_clean.split(":")[0])
                 except:
                     hour = 9
                 
-                # 4단계: 야간근무 (출근 시각 오후 17시부터 ~ 다음날 새벽 4시 59분 사이 밤샘조) -> 파란색
-                if hour >= 17 or hour < 5:
+                # 4단계: 야간근무 (출근 시각 오후 16:00시부터 ~ 다음날 새벽 04시 59분 사이 밤샘조) -> 파란색
+                if hour >= 16 or hour < 5:
                     return ["background-color: #DBEAFE; color: #1E40AF; font-weight: bold;"] * len(row)
                 
-                # 5단계: 주간근무 (아침 05시 ~ 오후 16시 59분 사이 출근 주간조) -> 황색
+                # 5단계: 주간근무 (일반 낮 승무조) -> 황색
                 else:
                     return ["background-color: #FEF08A; color: #854D0E; font-weight: bold;"] * len(row)
 
