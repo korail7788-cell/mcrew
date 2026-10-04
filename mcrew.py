@@ -219,16 +219,17 @@ for idx, tab in enumerate(m_tabs):
                 selection_mode="single-row"
             )
             
-            # 여러 행이 선택되거나 비어있을 때를 대비한 안전 코드 보완
+            # [수정 사항] 다중 선택 및 리스트 추출 구조 변경에 따른 0번 인덱스 추출 안전 장치 구축
             selected_row_idx = 0
             if selection and "rows" in selection.selection and selection.selection["rows"]:
-                # 선택된 것 중 가장 첫 번째 행의 인덱스를 가져옵니다
                 selected_row_idx = selection.selection["rows"][0]
                 
             v_date = str(df.iloc[selected_row_idx]["사업일자"])
             v_code = str(df.iloc[selected_row_idx]["다이아 번호"])
             v_on = str(df.iloc[selected_row_idx]["출근 시각"])
             v_off = str(df.iloc[selected_row_idx]["퇴근 시각"])
+            v_t1 = str(df.iloc[selected_row_idx]["대표 열번1"])
+            v_t2 = str(df.iloc[selected_row_idx]["대표 열번2"])
             
         with right_col:
             st.markdown(f'<div class="card-box">', unsafe_allow_html=True)
@@ -238,9 +239,6 @@ for idx, tab in enumerate(m_tabs):
                 st.markdown("<p style='color:#64748B; font-size:15px; margin:10px 0;'>오늘 하루 안전하고 편안하게 쉬세요냥! 😊</p>", unsafe_allow_html=True)
             else:
                 clean_dia = v_code.replace("~", "").replace("(", "").replace(")", "").strip()
-                is_full_dia = False
-                if len(clean_dia) >= 5:
-                    is_full_dia = True
                     
                 if clean_dia in ROSTER_DATA:
                     info = ROSTER_DATA[clean_dia]
@@ -260,8 +258,29 @@ for idx, tab in enumerate(m_tabs):
                     dt_df.columns = ["열차 번호", "출발 시각", "도착 시각", "승무 운행 구간"]
                     st.table(dt_df)
                 else:
-                    st.markdown(f"### 🔍 {v_date} [다이어 {v_code}]")
-                    st.error(f"출퇴근 시간: {v_on} ~ {v_off} | 마스터 데이터 원장에 정보가 누락되었습니다냥.")
+                    # [완벽 자동화] 원장에 데이터가 누락된 새로운 번호라도, 표 데이터 기반으로 에러 없이 즉시 표출
+                    st.markdown(f"### 🔍 {v_date} <span style='color:#E11D48;'>[다이어 {v_code} (자동 구성)]</span>", unsafe_allow_html=True)
+                    
+                    c1, c2 = st.columns(2)
+                    c1.metric("⏰ 출근 시각", v_on)
+                    c2.metric("🏁 퇴근 시각", v_off)
+                    
+                    st.markdown("""
+                        <div style='background-color:#FFF1F2; padding:12px; border-radius:8px; border-left:4px solid #F43F5E; margin:15px 0;'>
+                            <span style='color:#9F1239; font-size:14px;'>ℹ️ 해당 다이아의 상세 내역은 마스터 원장에 없으므로 표의 열차 정보를 실시간 파싱하여 자동 매칭했습니다.</span>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    
+                    dyn_details = []
+                    if v_t1 and v_t1 != "-":
+                        dyn_details.append({"열차 번호": v_t1, "출발 시각": v_on, "도착 시각": "-", "승무 운행 구간": "상세 내역 확인 필요"})
+                    if v_t2 and v_t2 != "-":
+                        dyn_details.append({"열차 번호": v_t2, "출발 시각": "-", "도착 시각": v_off, "승무 운행 구간": "상세 내역 확인 필요"})
+                        
+                    if dyn_details:
+                        st.table(pd.DataFrame(dyn_details))
+                    else:
+                        st.info("표기할 수 있는 대표 운행 열차 정보가 존재하지 않습니다.")
             st.markdown('</div>', unsafe_allow_html=True)
 
 # [하단부 업데이트 패널 디자인 고도화]
