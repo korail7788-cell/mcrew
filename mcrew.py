@@ -5,7 +5,7 @@ import io
 
 st.set_page_config(page_title="KORAIL CREW SYSTEM", layout="wide")
 
-# [완벽 반영] 사장님 지시 사항 탭 디자인 전면 강제 주입
+# [디자인 고도화] 최신 스트림릿 엔진 맞춤형 월 탭 볼드체 및 세로 구분 테두리선 강제 주입
 st.markdown("""
     <style>
         @import url('https://googleapis.com');
@@ -14,44 +14,43 @@ st.markdown("""
         .card-box { background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; margin-bottom: 15px; }
         .summary-box { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); padding: 15px; border-radius: 10px; border: 1px solid #CBD5E1; margin-top: 15px; }
         
-        /* [지시사항 1] 상단 월 탭: 볼드체 두껍게, 가로세로 폭 확장, 강력한 선명한 경계선 고정 */
-        div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+        /* [완벽 패치] 상단 월 탭 단추: 울트라 볼드체, 좌우 폭 대폭 확장, 선명한 격자 경계선 주입 */
+        div[data-testid="stTabBar"] {
             gap: 6px !important;
-            border-bottom: 2px solid #94A3B8 !important;
+            border-bottom: 3px solid #94A3B8 !important;
+            padding-bottom: 2px !important;
         }
-        div[data-testid="stTabs"] button[data-baseweb="tab"] {
+        button[data-testid="stTab"] {
             border-top: 2px solid #94A3B8 !important;
             border-left: 2px solid #94A3B8 !important;
             border-right: 2px solid #94A3B8 !important;
             border-bottom: none !important;
-            border-radius: 6px 6px 0 0 !important;
-            padding-left: 28px !important;
-            padding-right: 28px !important;
-            padding-top: 12px !important;
-            padding-bottom: 12px !important;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 12px 26px !important;
             background-color: #F1F5F9 !important;
             margin: 0 !important;
         }
-        div[data-testid="stTabs"] button[data-baseweb="tab"] p {
+        button[data-testid="stTab"] p {
             font-size: 17px !important;
-            font-weight: 900 !important;
-            color: #334155 !important;
+            font-weight: 900 !important; /* 가장 두꺼운 서체 */
+            color: #475569 !important;
         }
-        div[data-testid="stTabs"] button[aria-selected="true"] {
+        button[data-testid="stTab"][aria-selected="true"] {
             background-color: #1E293B !important;
-            border-top: 2px solid #38BDF8 !important;
+            border-top: 3px solid #38BDF8 !important;
             border-left: 2px solid #38BDF8 !important;
             border-right: 2px solid #38BDF8 !important;
         }
-        div[data-testid="stTabs"] button[aria-selected="true"] p {
+        button[data-testid="stTab"][aria-selected="true"] p {
             color: #38BDF8 !important;
         }
     </style>
     <div class="main-header">
-        <h1 style="color:#FFFFFF; margin:0; font-size:24px; font-weight:700;">🚄 KORAIL CREW SYSTEM <span style="font-size:15px; font-weight:300; color:#38BDF8;">v3.5 Stable</span></h1>
+        <h1 style="color:#FFFFFF; margin:0; font-size:24px; font-weight:700;">🚄 KORAIL CREW SYSTEM <span style="font-size:15px; font-weight:300; color:#38BDF8;">v3.6 Genuine</span></h1>
     </div>
 """, unsafe_allow_html=True)
 
+# 1. 승무행로표 마스터 데이터베이스 원장
 ROSTER_DATA = {
     "85001": {"work_time": "09:44", "rest_time": "00:00", "details": [
         {"train_no": "(510) (편승)", "dep_time": "10:42", "arr_time": "11:55", "section": "순천-익산"},
@@ -245,35 +244,36 @@ for idx, tab in enumerate(m_tabs):
             st.markdown("##### 📅 연간 일정표 (행 선택 시 우측 실시간 바인딩)")
             df = pd.DataFrame(rows, columns=["사업일자", "다이아 번호", "대표 열번1", "대표 열번2", "출근 시각", "퇴근 시각", "휴일 여부"])
             
-            # [지시사항 3] 야간 식별 오류 수정 및 빨강/고동/파랑/황색 필터 완벽 구현
+            # [요청사항 전면 교정] 야간 조건문 및 휴일대체(빨강) 최우선 도색 엔진
             def row_coloring(row):
                 d_num = str(row["다이아 번호"]).strip()
                 on_t = str(row["출근 시각"]).strip()
                 is_holiday = str(row["휴일 여부"]).strip()
                 
-                # 1. 쉬는 날 (지정휴무, 비번, S, -, *) -> 회색 바탕
+                # 1단계: 비번/지정휴무/쉬는 날 -> 회색 바탕
                 if d_num in ["-", "S", "*", ""] or on_t == "-" or "휴무" in d_num:
                     return ["background-color: #E2E8F0; color: #1E293B; font-weight: bold;"] * len(row)
                 
-                # 2. 휴일 대체 근무 (휴일여부가 Y이면서 실근무를 한 조) -> 빨간색 바탕 (최우선 적용)
+                # 2단계: 휴일에 근무한 대체근무 (휴일여부 Y이면서 정상 출근한 조) -> 빨간색 바탕
                 if is_holiday == "Y":
-                    return ["background-color: #FEE2E2; color: #991B1B; font-weight: bold;"] * len(row)
+                    return ["background-color: #FEE2E2; color: #B91C1C; font-weight: bold;"] * len(row)
                 
-                # 3. 평일 대체 근무 (평일인데 다이아 명칭에 대체/대출이 들어간 조) -> 고동색 바탕
+                # 3단계: 평일 대체근무조 (평일 N이면서 다이아명에 대체/대출 포함) -> 고동색 바탕
                 if "대체" in d_num or "대출" in d_num:
                     return ["background-color: #4A3728; color: #FFFFFF; font-weight: bold;"] * len(row)
                 
-                # 시각 추출 문자열 정밀화 파싱
+                # [버그 수정 완료] 문자열에서 괄호, 공백, 요일 완전 분리 후 순수 출근 시각(Hour) 정수 추출
                 try:
-                    hour = int(on_t.split(":")[0])
+                    time_part = on_t.split()[0] if " " in on_t else on_t
+                    hour = int(time_part.split(":")[0])
                 except:
                     hour = 9
                 
-                # 4. 야간 근무 (오후 18:00 ~ 새벽 04:59 출근조) -> 파란색 바탕
+                # 4단계: 야간근무 (출근 시각 오후 18시 이후 ~ 새벽 05시 이전 밤샘조) -> 파란색 바탕
                 if hour >= 18 or hour < 5:
                     return ["background-color: #DBEAFE; color: #1E40AF; font-weight: bold;"] * len(row)
                 
-                # 5. 주간 근무 (기본 주간 승무조) -> 황색 바탕
+                # 5단계: 주간근무 (일반 아침/낮 승무조) -> 황색 바탕
                 else:
                     return ["background-color: #FEF08A; color: #854D0E; font-weight: bold;"] * len(row)
 
@@ -285,12 +285,12 @@ for idx, tab in enumerate(m_tabs):
             
             selected_row_idx = 0
             if selection and "rows" in selection.selection and selection.selection["rows"]:
-                selected_row_idx = selection.selection["rows"][0]
+                selected_row_idx = selection.selection["rows"]
                 
             v_date, v_code = str(df.iloc[selected_row_idx]["사업일자"]), str(df.iloc[selected_row_idx]["다이아 번호"])
             v_on, v_off = str(df.iloc[selected_row_idx]["출근 시각"]), str(df.iloc[selected_row_idx]["퇴근 시각"])
             v_t1, v_t2 = str(df.iloc[selected_row_idx]["대표 열번1"]), str(df.iloc[selected_row_idx]["대표 열번2"])
-            # [지시사항 2] 하단 총 실근무일수 및 정밀 누적 근무시간 계산 합산기
+            # [요청사항 2] 하단 총 실근무일수 및 정밀 누적 근무시간 계산 합산기
             total_days, total_minutes = 0, 0
             for _, r in df.iterrows():
                 d_num, on_t = str(r["다이아 번호"]).strip(), str(r["출근 시각"]).strip()
@@ -305,7 +305,6 @@ for idx, tab in enumerate(m_tabs):
                         except: pass
                     else:
                         try:
-                            # 시각에 포함된 불필요 요일 문자열(괄호) 완전 소거 후 계산
                             pure_on = on_t.split()[0] if " " in on_t else on_t
                             pure_off = str(r["퇴근 시각"]).split()[0] if " " in str(r["퇴근 시각"]) else str(r["퇴근 시각"])
                             sh, sm = map(int, pure_on.split(":"))
@@ -368,16 +367,16 @@ with st.expander("📋 웹페이지 연간 스케줄 데이터 실시간 파싱 
                 if not l.strip() or "사업일자" in l or "다이아" in l: continue
                 tk = l.split("\t")
                 if len(tk) >= 7:
-                    dt_str = tk[0].strip()
+                    dt_str = tk.strip()
                     m_val = None
                     for s in ['.', '-', '/']:
                         if s in dt_str and len(dt_str.split(s)) >= 2:
-                            try: m_val = str(int(dt_str.split(s)[1]))
+                            try: m_val = str(int(dt_str.split(s)))
                             except: continue
                             break
                     if m_val and m_val in st.session_state.db:
-                        st.session_state.db[m_val] = [x for x in st.session_state.db[m_val] if x[0] != dt_str]
+                        st.session_state.db[m_val] = [x for x in st.session_state.db[m_val] if x != dt_str]
                         st.session_state.db[m_val].append([t.strip() for t in tk[:7]])
-                        st.session_state.db[m_val].sort(key=lambda x: x[0])
+                        st.session_state.db[m_val].sort(key=lambda x: x)
                         pc += 1
             if pc > 0: st.success(f"성공: 총 {pc}개의 행을 완벽하게 디자인 엔진에 주입 완료했습니다냥!"); st.rerun()
